@@ -6,9 +6,10 @@ var UsersAndTransactions = function(address) {
   this.web3 = web3;
 };
 
-UsersAndTransactions.prototype.createWallet = function(passphrase) {
+UsersAndTransactions.prototype.createWallet = function(passphrase, callback) {
   const privateKey = web3.sha3(passphrase);
   const wallet = new ethers.Wallet(privateKey);
+  return callback(wallet);
 };
 
 
