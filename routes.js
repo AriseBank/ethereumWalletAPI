@@ -3,20 +3,21 @@ const express = require('express'),
       router = express.Router();
 
 router.all('/*', (req, res, next) => {
-  var usersAndTransactions = new UsersAndTransactions(req.address);
+  debugger;
+  var usersAndTransactions = new UsersAndTransactions(req.decodedData.username);
   req.usersAndTransactions = usersAndTransactions;
   next();
 });
 
 router.post('/wallet/new', (req, res) => {
-  let passphrase = req.passphrase;
-  req.usersAndTransactions.createWallet(passphrase, function(wallet) {
+  let passphrase = req.body.passphrase;
+  let username = req.usersAndTransaction.username;
+  req.usersAndTransactions.createWallet(username, passphrase, function(wallet) {
     res.send({address: wallet.address});
   });
 });
 
 router.get('/wallet/:address/balance', (req, res) => {
-  debugger;
 });
 
 module.exports = router;
