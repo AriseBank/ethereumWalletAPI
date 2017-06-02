@@ -3,29 +3,71 @@ const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 const ethers = require('ethers-wallet');
 const fs = require('fs');
 
-var UsersAndTransactions = function(address, username) {
+var UsersAndTransactions = function(username) {
   this.web3 = web3;
   this.username = username;
 };
 
-UsersAndTransactions.prototype.createWallet = function(username, passphrase, callback) {
-  const privateKey = web3.sha3(passphrase);
-  const wallet = new ethers.Wallet(privateKey);
-  this.encryptWallet(wallet, passphrase, function(encryptedWallet) {
-    if (!fs.existsSync('./wallets/')) {
-      fs.mkdirSync('./wallets/');
-    }
-    fs.writeFileSync('./wallets/' + username, json);
-  });
-  return callback(wallet);
+UsersAndTransactions.prototype.createNewWallet = function(username, passphrase) {
+  return new Promise(function(resolve, reject) {
+    this.createWallet(username, passphrase).then(function(wallet) {
+      this.encryptWallet(wallet, passphrase).then(function(encryptedWallet) {
+        this.writeEncryptedWallet(encryptedWallet).then(function () {
+          resolve(true)
+        }.bind(this))
+        .catch(function(reason) {
+          reject(reason);
+        });
+      }.bind(this))
+      .catch(function(reason) {
+        reject(reason);
+      });
+    }.bind(this))
+    .catch(function(reason) {
+      reject(reason);
+    });
+  }.bind(this));
 };
 
-UsersAndTransactions.prototype.encryptWallet = function(wallet, passphrase) {
-  wallet.encrypt(passphrase, function(percent) {
-    console.log("Encrypting: " + parseInt(percent * 100) + "% complete");
-  }).then(function(json) {
-    return json;
+UsersAndTransactions.prototype.createWallet = function(username, passphrase) {
+  return new Promise(function (resolve, reject) {
+    try {
+      fs.statSync("./wallets/" + 'a' + ".dat").isFile();
+      reject("Wallet with your username already exists!")
+    } catch (e) {
+      const privateKey = web3.sha3(passphrase);
+      const wallet = new ethers.Wallet(privateKey);
+      resolve(wallet);
+    }
+  }.bind(this));
+};
+
+UsersAndTransactions.prototype.encryptWallet = function(wallet, passphrase, callback) {
+  return new Promise(function (resolve, reject) {
+    wallet.encrypt(passphrase, function(percent) {
+      console.log("Encrypting: " + parseInt(percent * 100) + "% complete");
+    }).then(function(json) {
+      resolve(json);
+    });
   });
+};
+
+UsersAndTransactions.prototype.writeEncryptedWallet = function(encryptedWallet) {
+  return new Promise(function (resolve, reject) {
+    try {
+      if (!fs.existsSync('./wallets/')) {
+        fs.mkdirSync('./wallets/');
+      }
+      fs.writeFileSync('./wallets/' + username + '.dat', encryptedWallet);
+      resolve(true);
+    } catch(e) {
+      reject(e);
+    }
+  }.bind(this));
+};
+
+UsersAndTransactions.prototype.getBalance = function(address) {
+  return web3.eth.getBalance(address);
 };
 
 

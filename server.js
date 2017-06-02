@@ -13,7 +13,6 @@ app.use(function(req, res, next) {
 });
 
 var verifyHeaders = function (req, res, next) {
-  debugger;
   var signature = req.header('X-Signature');
   var data = req.header('X-Data');
   var decodedData = encryption.decodeData(data);
