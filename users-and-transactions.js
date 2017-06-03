@@ -1,3 +1,4 @@
+"use strict";
 const Web3 = require('web3');
 const web3 = new Web3(new Web3.providers.HttpProvider("http://localhost:8545"));
 const ethers = require('ethers-wallet');
@@ -9,30 +10,28 @@ var UsersAndTransactions = function(username) {
 };
 
 UsersAndTransactions.prototype.createNewWallet = function(username, passphrase) {
-  return new Promise(function(resolve, reject) {
-    this.createWallet(username, passphrase).then(function(wallet) {
-      this.encryptWallet(wallet, passphrase).then(function(encryptedWallet) {
-        this.writeEncryptedWallet(encryptedWallet).then(function () {
-          resolve(true)
-        }.bind(this))
-        .catch(function(reason) {
+  return new Promise((resolve, reject) => {
+    this.createWallet(username, passphrase).then((wallet) => {
+      this.encryptWallet(wallet, passphrase).then((encryptedWallet) => {
+        this.writeEncryptedWallet(encryptedWallet).then((encryptedWallet) => {
+          const encryptedWalletId = JSON.parse(encryptedWallet).id;
+          resolve(encryptedWalletId);
+        }).catch(function(reason) {
           reject(reason);
         });
-      }.bind(this))
-      .catch(function(reason) {
+      }).catch(function(reason) {
         reject(reason);
       });
-    }.bind(this))
-    .catch(function(reason) {
+    }).catch(function(reason) {
       reject(reason);
     });
-  }.bind(this));
+  });
 };
 
 UsersAndTransactions.prototype.createWallet = function(username, passphrase) {
   return new Promise(function (resolve, reject) {
     try {
-      fs.statSync("./wallets/" + 'a' + ".dat").isFile();
+      fs.statSync("./wallets/" + 'asdas' + ".dat").isFile();
       reject("Wallet with your username already exists!")
     } catch (e) {
       const privateKey = web3.sha3(passphrase);
@@ -42,7 +41,7 @@ UsersAndTransactions.prototype.createWallet = function(username, passphrase) {
   }.bind(this));
 };
 
-UsersAndTransactions.prototype.encryptWallet = function(wallet, passphrase, callback) {
+UsersAndTransactions.prototype.encryptWallet = function(wallet, passphrase, username) {
   return new Promise(function (resolve, reject) {
     wallet.encrypt(passphrase, function(percent) {
       console.log("Encrypting: " + parseInt(percent * 100) + "% complete");
@@ -58,8 +57,9 @@ UsersAndTransactions.prototype.writeEncryptedWallet = function(encryptedWallet) 
       if (!fs.existsSync('./wallets/')) {
         fs.mkdirSync('./wallets/');
       }
-      fs.writeFileSync('./wallets/' + username + '.dat', encryptedWallet);
-      resolve(true);
+      debugger;
+      fs.writeFileSync('./wallets/' + 'asdf' + '.dat', encryptedWallet);
+      resolve(encryptedWallet);
     } catch(e) {
       reject(e);
     }
