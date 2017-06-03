@@ -10,11 +10,13 @@ router.all('/*', (req, res, next) => {
 
 router.post('/wallet/new', (req, res) => {
   let passphrase = req.decodedData.passphrase;
+  debugger;
   let username = req.usersAndTransactions.username;
-  req.usersAndTransactions.createNewWallet(username, passphrase).then(function(wallet) {
-    res.send({address: wallet.address});
+  req.usersAndTransactions.createNewWallet(username, passphrase).then(function(encryptedWalletId) {
+    res.send({encryptedWalletId});
   }).catch(function(reason) {
-    res.send({success: 0, message:reason});
+    debugger;
+    res.send({success: 0, message: reason});
   });
 });
 
