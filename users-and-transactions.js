@@ -37,6 +37,25 @@ UsersAndTransactions.prototype.createWallet = function(username, passphrase) {
   });
 };
 
+UsersAndTransactions.prototype.sendToExternal = function(address, amount) {
+  let transactionObject = {
+    from: web3.eth.coinbase,
+    to: address,
+    value: web3.toWei(amount, 'ether'),
+    gas: 0
+  }
+  transactionObject.gas = web3.eth.estimateGas({ to: address, from: web3.eth.coinbase, value: web3.toWei(amount, 'ether') })
+  web3.personal.unlockAccount(web3.eth.coinbase, "pass")
+  web3.eth.sendTransaction(transactionObject, (err, address) => {
+    web3.personal.lockAccount(web3.eth.coinbase);
+    if (err) {
+      console.log(err);
+    } else {
+      console.log(address);
+    }
+  })
+};
+
 UsersAndTransactions.prototype.encryptWallet = function(wallet, passphrase, username) {
   return new Promise((resolve, reject) => wallet.encrypt(passphrase, (percent) => {
     console.log("Encrypting: " + parseInt(percent * 100) + "% complete");
