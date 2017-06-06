@@ -16,12 +16,13 @@ UsersAndTransactions.prototype.createNewWallet = function(username, passphrase) 
     this.createWallet(username, passphrase).then((wallet) => {
       this.encryptWallet(wallet, passphrase).then((encryptedWallet) => {
         this.writeEncryptedWallet(encryptedWallet).then((encryptedWallet) => {
-          resolve(JSON.parse(encryptedWallet).id);
+          resolve("0x" + JSON.parse(encryptedWallet).address);
         }).catch((reason) => reject(reason));
       }).catch((reason) => reject(reason));
     }).catch((reason) => reject(reason));
   });
 };
+
 
 UsersAndTransactions.prototype.createWallet = function(username, passphrase) {
   return new Promise((resolve, reject) => {
@@ -57,8 +58,18 @@ UsersAndTransactions.prototype.writeEncryptedWallet = function(encryptedWallet) 
 };
 
 UsersAndTransactions.prototype.getBalance = function(address) {
-  return web3.eth.getBalance(address);
+  return new Promise((resolve, reject) => {
+    let balance = web3.fromWei(web3.eth.getBalance(address).toString(10));
+    resolve(balance);
+  });
 };
 
+UsersAndTransactions.prototype.getUserBalance = function(address) {
+  return new Promise((resolve, reject) => {
+    this.getBalance(address).then((balance) => {
+      resolve(balance);
+    }).catch((e) => reason(e));
+  });
+};
 
 module.exports = UsersAndTransactions;
